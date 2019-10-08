@@ -1,71 +1,36 @@
-plugins {
-    id 'org.ajoberstar.reckon' version '0.11.0'
-    id 'org.ajoberstar.grgit' version '3.1.1'
-    id 'com.github.ben-manes.versions' version '0.22.0'
+buildscript {
+    repositories {
+        jcenter()
+        maven { url = "http://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
 }
+apply plugin: 'net.minecraftforge.gradle.forge'
 
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
-apply plugin: 'jacoco'
-apply plugin: 'java-library'
-
-group 'cpw.mods.forge'
+version = "1.2.0-A1"
+group = "cpw.mods.forge"
+archivesBaseName = "cursepacklocator"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-    maven {
-        name = "forge"
-        url = "http://files.minecraftforge.net/maven"
-    }
-}
-
-jacoco {
-    toolVersion = "0.8.2"
-}
-
-reckon {
-    scopeFromProp()
-    stageFromProp('milestone', 'rc', 'final')
-}
-
-reckonTagCreate.dependsOn check
-
-dependencyUpdates.resolutionStrategy {
-    componentSelection { rules ->
-        rules.all { ComponentSelection selection ->
-            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview'].any { qualifier ->
-                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-            }
-            if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
-    }
-}
-
-test {
-    useJUnitPlatform()
+minecraft {
+    version = "1.12.2-14.23.5.2768"
+    runDir = "run"
+    mappings = "stable_39"
 }
 
 ext.sharedManifest = manifest {
     attributes(
-            "Class-Path": "forge.jar",
-            'Main-Class': 'net.minecraftforge.server.ServerMain',
-            'ServerLaunchArgs': '--gameDir . --launchTarget fmlserver --fml.forgeVersion 28.1.39 --fml.mcpVersion 20190829.143755 --fml.mcVersion 1.14.4 --fml.forgeGroup net.minecraftforge'
-    )
-    attributes(
             ["Specification-Title"     : "cursepackloader",
-                "Specification-Vendor"    : "cpw",
-                "Specification-Version"   : "1", // Currently version 3 of the forgespi specification
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : "${version}+${System.getenv("BUILD_NUMBER") ?: 0}+${grgit.head().abbreviatedId}",
-                "Implementation-Vendor"   : "cpw",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "Git-Commit"              : grgit.head().abbreviatedId,
-                "Git-Branch"              : grgit.branch.current().getName()],
+             "Specification-Vendor"    : "cpw",
+             "Specification-Version"   : "1", // Currently version 3 of the forgespi specification
+             "Implementation-Title"    : project.name,
+             "Implementation-Version"  : "${version}+${System.getenv("BUILD_NUMBER") ?: 0}",
+             "Implementation-Vendor"   : "cpw",
+             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],
             "cpw/mods/forge/cursepacklocator/")
 }
 
@@ -75,77 +40,10 @@ jar {
     }
 }
 
-task sourcesJar(type: Jar) {
-    archiveClassifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-
-dependencies {
-    implementation("net.minecraftforge:forgespi:1.4.+")
-    implementation("cpw.mods:modlauncher:3.2.+")
-    implementation("com.google.code.gson:gson:2.8.0")
-    implementation("org.apache.logging.log4j:log4j-api:2.11.2")
-}
-
 task zip(type: Zip, dependsOn: jar) {
-    archiveClassifier = "bundle"
     from (jar.outputs) { into ("libraries/cpw/mods/forge/cursepacklocator/${project.version}/") }
-    from (file("1.14.4-cursepacklocator.json")) {
+    from (file("1.12.2-cursepacklocator.json")) {
         filter { line -> line.replace('@version@', "${project.version}") }
-        into ("versions/1.14.4-cursepacklocator/")
-    }
-}
-
-artifacts {
-    archives zip
-    archives jar
-    archives sourcesJar
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            artifact sourcesJar
-            artifact zip
-            pom {
-                name = 'Curse Pack Mod Locator'
-                description = 'Curse Pack Mod Locator'
-                url = 'https://github.com/cpw/cursepackmodlocator'
-                scm {
-                    url = 'https://github.com/cpw/cursepackmodlocator'
-                    connection = 'scm:git:git://github.com/cpw/cursepackmodlocator.git'
-                    developerConnection = 'scm:git:git@github.com:cpw/cursepackmodlocator.git'
-                }
-                issueManagement {
-                    system = 'github'
-                    url = 'https://github.com/cpw/cursepackmodlocator/issues'
-                }
-
-                licenses {
-                    license {
-                        name = 'LGPLv2.1'
-                        url = 'https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id = 'cpw'
-                        name = 'cpw'
-                    }
-                }
-            }
-        }
-    }
-    repositories {
-        maven {
-            credentials {
-                username project.properties.cpwMavenUser?:'fake'
-                password project.properties.cpwMavenPassword?:'news'
-            }
-            url "http://files.minecraftforge.net/maven/manage/upload"
-        }
+        into ("versions/1.12.2-cursepacklocator/")
     }
 }

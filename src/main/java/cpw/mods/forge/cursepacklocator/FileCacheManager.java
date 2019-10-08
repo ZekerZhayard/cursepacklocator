@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
-import cpw.mods.modlauncher.Launcher;
-import cpw.mods.modlauncher.api.IEnvironment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,11 +27,6 @@ public class FileCacheManager {
     private final Path infos;
     private final Path files;
     private Consumer<String> progressUpdater;
-
-    FileCacheManager() {
-        this(Launcher.INSTANCE.environment().getProperty(IEnvironment.Keys.ASSETSDIR.get())
-                .orElseGet(()->DirHandler.createOrGetDirectory(Paths.get("."), "cursecache")));
-    }
 
     public FileCacheManager(final Path assetsDir) {
         final Path cheesycursecache = DirHandler.createOrGetDirectory(assetsDir, "cheesycursecache");

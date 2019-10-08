@@ -1,0 +1,17 @@
+{
+  "id": "1.12.2-cursepacklocator",
+  "time": "2019-09-01T18:46:04+00:00",
+  "releaseTime": "2019-09-01T18:46:04+00:00",
+  "type": "release",
+  "minecraftArguments": "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --tweakClass cpw.mods.forge.cursepacklocator.CurseLocator --versionType Forge",
+  "mainClass": "net.minecraft.launchwrapper.Launch",
+  "inheritsFrom": "1.12.2-forge1.12.2-14.23.5.2768",
+  "logging": {
+
+  },
+  "libraries": [
+    {
+      "name": "cpw.mods.forge:cursepacklocator:@version@"
+    }
+  ]
+}

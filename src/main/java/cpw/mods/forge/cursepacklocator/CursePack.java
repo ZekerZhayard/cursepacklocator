@@ -2,7 +2,6 @@ package cpw.mods.forge.cursepacklocator;
 
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
-import net.minecraftforge.forgespi.locating.IModFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,7 +41,7 @@ public class CursePack {
         } else {
             try (JsonReader jsonReader = new Gson().newJsonReader(Files.newBufferedReader(gameDir.resolve("manifest.json")))) {
                 manifest1 = new JsonParser().parse(jsonReader).getAsJsonObject();
-                curseModDir = DirHandler.createOrGetDirectory(gameDir, "cursemods");
+                curseModDir = DirHandler.createOrGetDirectory(gameDir, "mods");
                 validPack = true;
             } catch (IOException e) {
                 LOGGER.info("Error trying to load manifest.json", e);
@@ -139,9 +138,5 @@ public class CursePack {
 
     public Path getCurseModPath() {
         return curseModDir;
-    }
-
-    public boolean fileInPack(final IModFile modFile) {
-        return fileNames.contains(modFile.getFileName());
     }
 }
